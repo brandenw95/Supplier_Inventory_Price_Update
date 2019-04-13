@@ -2,7 +2,17 @@ import sys
 import os
 import re
 import csv
-#import pandas as pd
+
+#GLOBAL_VARIABLES
+
+PROSTREET_IN = "b_export.csv"
+PREMIERWD_IN = "supplierfull.csv" 
+PROSTREET_OUT = "UPLOAD.csv" 
+
+#PROSTREET_IN = Export from prostreet
+#PREMIERWD = Data export from Premierwd
+#PROSTREET_OUT = Final output with updated pricing, ready for upload to Prostreet
+
 
 def proccess_line(export_line, FILEOUT, header_export):
         #Proccess each line of the file exported from the website
@@ -14,32 +24,24 @@ def proccess_line(export_line, FILEOUT, header_export):
         export_price = export_line[export_price_index] 
         
         #open the supplier file (Wont loop every line elsewise)
-        read_in_one = open("supplier.csv", 'r')
+        read_in_one = open(PREMIERWD_IN, 'r')
         supplier_file = csv.reader(read_in_one)
         header_supplier = next(supplier_file, None)
 
         #define the sku and the price of the suppliers info
-        supplier_price_index = header_supplier.index('Variant Price')
-        supplier_sku_index = header_supplier.index('Variant SKU')
-        
-
-        #Test code // Delete after
-        #print("Export line w/o prices = ", export_sku, export_price)
-        #print("Supplier type = ", type(supplier_sku_index))
-        #print("Export type = ", type(export_sku))
-        #print("Supplier sku = ", supplier_sku_index, "Supplier price = ", supplier_price)
-        #print(export_sku)
+        supplier_price_index = header_supplier.index('MAP')
+        supplier_sku_index = header_supplier.index('VendorPartNumber')
 
         #Create a copy of the current row of export
         row = []
         row = export_line
-        
 
+        #Check each line in PROSTREET_IN and compare with every line in the PREMIERWD file 
         for supplier_line in supplier_file:
                 
                 if (export_sku == supplier_line[supplier_sku_index]):
 
-                        row[export_price_index] = supplier_line[supplier_price_index]
+                        row[export_price_index] = supplier_line[supplier_price_index].strip('$')
                         FILEOUT.writerow(row)
                 else:
                         pass
@@ -49,8 +51,8 @@ def proccess_line(export_line, FILEOUT, header_export):
 def main():
 
         # Open file: website export, supplier export and create writable file
-        f_out = open("export.csv", 'r')
-        new_file = open("final.csv", 'w', newline='')
+        f_out = open(PROSTREET_IN, 'r')
+        new_file = open(PROSTREET_OUT, 'w', newline='')
         reader2 = csv.reader(f_out)
         writer = csv.writer(new_file)
 
@@ -64,11 +66,12 @@ def main():
         for line in reader2:
                 proccess_line(line, writer, header_supplier)
 
+        print("FINISHED", end='')
+
+        #Close the files
         f_out.close()
         new_file.close()
         
-
-                
 
 if __name__ == "__main__":
     main()
