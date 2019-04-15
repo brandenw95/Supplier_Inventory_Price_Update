@@ -2,11 +2,12 @@ import sys
 import os
 import re
 import csv
+import pandas as pd
 
 #GLOBAL_VARIABLES
 
-PROSTREET_IN = "b_export.csv"
-PREMIERWD_IN = "supplierfull.csv" 
+PROSTREET_IN = "prostreet.csv"
+PREMIERWD_IN = "premier.csv" 
 PROSTREET_OUT = "UPLOAD.csv" 
 
 #PROSTREET_IN = Export from prostreet
@@ -21,10 +22,10 @@ def proccess_line(export_line, FILEOUT, header_export):
         export_sku_index = header_export.index('Variant SKU')
         export_price_index = header_export.index('Variant Price')
         export_sku = export_line[export_sku_index]
-        export_price = export_line[export_price_index] 
+        export_price = export_line[export_price_index]
         
         #open the supplier file (Wont loop every line elsewise)
-        read_in_one = open(PREMIERWD_IN, 'r')
+        read_in_one = open(PREMIERWD_IN, 'r', encoding="utf8")
         supplier_file = csv.reader(read_in_one)
         header_supplier = next(supplier_file, None)
 
@@ -41,7 +42,7 @@ def proccess_line(export_line, FILEOUT, header_export):
                 
                 if (export_sku == supplier_line[supplier_sku_index]):
 
-                        row[export_price_index] = supplier_line[supplier_price_index].strip('$')
+                        row[export_price_index] = float(supplier_line[supplier_price_index].strip('$'))
                         FILEOUT.writerow(row)
                 else:
                         pass
@@ -51,8 +52,8 @@ def proccess_line(export_line, FILEOUT, header_export):
 def main():
 
         # Open file: website export, supplier export and create writable file
-        f_out = open(PROSTREET_IN, 'r')
-        new_file = open(PROSTREET_OUT, 'w', newline='')
+        f_out = open(PROSTREET_IN, 'r', encoding="utf8")
+        new_file = open(PROSTREET_OUT, 'w', newline='', encoding="utf8")
         reader2 = csv.reader(f_out)
         writer = csv.writer(new_file)
 
