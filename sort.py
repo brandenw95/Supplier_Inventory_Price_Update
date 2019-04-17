@@ -20,6 +20,7 @@ def proccess_line(export_line, FILEOUT, header_export):
         #Proccess each line of the file exported from the website
 
         #Variable declaration for Prostreet Export
+        #test (PLS DELETE LINE)
         export_sku_index = header_export.index('Variant SKU')
         export_price_index = header_export.index('Variant Price')
         export_policy_index = header_export.index('Variant Inventory Policy')
