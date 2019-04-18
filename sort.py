@@ -3,17 +3,38 @@ import os
 import re
 import csv
 import pandas as pd
+from ftplib import FTP
+import socket
+
+
 
 #Premier FTP Support email: datateam@premierwd.com
 
 #GLOBAL_VARIABLES
 PROSTREET_IN = "prostreet.csv"
-PREMIERWD_IN = "premier.csv" 
+PREMIERWD_IN = "Rigid_data.csv" 
 PROSTREET_OUT = "UPLOAD.csv" 
 
 #PROSTREET_IN = Export from prostreet
 #PREMIERWD = Data export from Premierwd
 #PROSTREET_OUT = Final output with updated pricing, ready for upload to Prostreet
+
+def grab_file_from_ftp():
+
+        #define FTP and login credentials
+        ftp = FTP('datafeed.pppwd.com')
+        ftp.login(user='05-PROST01', passwd='premierpass')
+
+        #Info and status of transfer to console
+        print(ftp.retrlines('LIST'))
+        
+        #filename = 'Bilstein.zip'
+        localfile = open(PREMIERWD_IN, 'wb')
+        ftp.retrbinary('RETR ' + PREMIERWD_IN, localfile.write, 1024)
+        ftp.quit()
+        localfile.close()
+
+
 
 
 def proccess_line(export_line, FILEOUT, header_export):
@@ -40,8 +61,8 @@ def proccess_line(export_line, FILEOUT, header_export):
 
         #define the sku and the price of the suppliers info
         supplier_price_index = header_supplier.index('MAP')
-        supplier_sku_index = header_supplier.index('VendorPartNumber')
-        supplier_stocking_index = header_supplier.index('Status')
+        supplier_sku_index = header_supplier.index('Mfg Part Number')
+        supplier_stocking_index = header_supplier.index('Inventory Status')
 
 
         #Create a copy of the current row of export
@@ -52,21 +73,23 @@ def proccess_line(export_line, FILEOUT, header_export):
         # - Updates price
         # - Sets Policy to deny so items with 0 QTY show as "Sold out" / "Special order"
         # - Sets all Products not stocked by premier to QTY 0 
+        print("Before for loop ")
         for supplier_line in supplier_file:
                 
-                
+                #print(supplier_line)
                 if (export_sku == supplier_line[supplier_sku_index]):
-
+                        
+                        print("setting price ")
                         #Set Price
                         row[export_price_index] = float(supplier_line[supplier_price_index].strip('$'))
-                        
+                        print("setting policy ")
                         #Set Policy
                         row[export_policy_index] = 'deny'
-                        
+                        print("setting stock ")
                         #Set Stocking Check
                         if(supplier_line[supplier_stocking_index] == 'Non Stocking'):
                                 row[export_qty_index] = 0
-                        
+                        print("writing ")
                         #Write row to file
                         FILEOUT.writerow(row)
 
@@ -79,6 +102,10 @@ def proccess_line(export_line, FILEOUT, header_export):
 
 def main():
 
+        #Grab ftp
+        grab_file_from_ftp()
+        
+        
         # Open file: website export, supplier export and create writable file
         f_out = open(PROSTREET_IN, 'r', encoding="utf8")
         new_file = open(PROSTREET_OUT, 'w', newline='', encoding="utf8")
