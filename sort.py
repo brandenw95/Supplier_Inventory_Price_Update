@@ -15,6 +15,11 @@ PROSTREET_IN = "prostreet.csv"
 PREMIERWD_IN = "Rigid_data.csv" 
 PROSTREET_OUT = "UPLOAD.csv" 
 
+#GLOBAL VARIABLES FOR LOGIN
+FTP_ADDRESS = "ftp://website"
+LOGIN_USER = "USER"
+LOGIN_USER_PASS = "PASSWORD"
+
 #PROSTREET_IN = Export from prostreet
 #PREMIERWD = Data export from Premierwd
 #PROSTREET_OUT = Final output with updated pricing, ready for upload to Prostreet
@@ -22,8 +27,8 @@ PROSTREET_OUT = "UPLOAD.csv"
 def grab_file_from_ftp():
 
         #define FTP and login credentials
-        ftp = FTP('datafeed.pppwd.com')
-        ftp.login(user='05-PROST01', passwd='premierpass')
+        ftp = FTP(FTP_ADDRESS)
+        ftp.login(user= LOGIN_USER, passwd=LOGIN_USER_PASS)
 
         #Info and status of transfer to console
         print(ftp.retrlines('LIST'))
