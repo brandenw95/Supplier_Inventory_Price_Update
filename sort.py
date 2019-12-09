@@ -129,7 +129,7 @@ def main():
 
         print("FINISHED", end='')
 
-        #Close the files
+        #Close the files 
         f_out.close()
         new_file.close()
         
