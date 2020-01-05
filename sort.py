@@ -11,8 +11,8 @@ import socket
 #Premier FTP Support email: datateam@premierwd.com
 
 #GLOBAL_VARIABLES
-PROSTREET_IN = "prostreet.csv"
-PREMIERWD_IN = "Rigid_data.csv" 
+PROSTREET_IN = "products.csv"
+PREMIERWD_IN = "all_s.csv" 
 PROSTREET_OUT = "UPLOAD.csv" 
 
 #GLOBAL VARIABLES FOR LOGIN
@@ -46,7 +46,6 @@ def proccess_line(export_line, FILEOUT, header_export):
         #Proccess each line of the file exported from the website
 
         #Variable declaration for Prostreet Export
-        #test (PLS DELETE LINE)
         export_sku_index = header_export.index('Variant SKU')
         export_price_index = header_export.index('Variant Price')
         export_policy_index = header_export.index('Variant Inventory Policy')
@@ -108,7 +107,7 @@ def proccess_line(export_line, FILEOUT, header_export):
 def main():
 
         #Grab ftp
-        grab_file_from_ftp()
+        #grab_file_from_ftp()
         
         
         # Open file: website export, supplier export and create writable file
@@ -125,6 +124,7 @@ def main():
         
         # loop through both files at the same time, stops once shorter list completes
         for line in reader2:
+                print("DONE")
                 proccess_line(line, writer, header_supplier)
 
         print("FINISHED", end='')
